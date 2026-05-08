@@ -1,10 +1,9 @@
 services:
   - type: web
     name: broadlab-creative-intelligence
-    runtime: python
-    rootDir: backend
-    buildCommand: apt-get update -y && apt-get install -y ffmpeg && pip install -r requirements.txt
-    startCommand: python main.py
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
     envVars:
       - key: ANTHROPIC_API_KEY
         sync: false

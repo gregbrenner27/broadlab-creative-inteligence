@@ -3,7 +3,7 @@ services:
     name: broadlab-creative-intelligence
     runtime: python
     rootDir: backend
-    buildCommand: apt-get install -y ffmpeg && pip install -r requirements.txt
+    buildCommand: apt-get update -y && apt-get install -y ffmpeg && pip install -r requirements.txt
     startCommand: python main.py
     envVars:
       - key: ANTHROPIC_API_KEY

@@ -64,7 +64,7 @@ AWS_SECRET_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
 AWS_REGION = os.getenv("AWS_REGION", "eu-west-2")
 S3_BUCKET = os.getenv("AWS_S3_BUCKET")
 REKOGNITION_ROLE_ARN = os.getenv("AWS_REKOGNITION_ROLE_ARN")
-BACKEND_PORT = int(os.getenv("BACKEND_PORT", "8000"))
+BACKEND_PORT = int(os.getenv("PORT", os.getenv("BACKEND_PORT", "8000")))
 
 # Temp directory where pipeline files are stored during analysis
 TEMP_BASE_DIR = Path(__file__).parent / "temp"
@@ -82,9 +82,20 @@ app = FastAPI(
 # CORS middleware — allows the React frontend (running on port 5173) to
 # call this API (running on port 8000) without being blocked by the browser's
 # security rules (CORS = Cross-Origin Resource Sharing)
+ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+    "http://localhost:3000",
+]
+# Allow any Vercel preview/production URL — set FRONTEND_URL in Railway/Render env vars
+# to lock it down to a specific domain once deployed
+FRONTEND_URL = os.getenv("FRONTEND_URL", "")
+if FRONTEND_URL:
+    ALLOWED_ORIGINS.append(FRONTEND_URL)
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://localhost:3000"],
+    allow_origins=ALLOWED_ORIGINS,
+    allow_origin_regex=r"https://.*\.vercel\.app",  # allows all Vercel domains
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

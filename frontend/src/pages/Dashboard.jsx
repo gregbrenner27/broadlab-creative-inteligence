@@ -7,6 +7,8 @@ import { useNavigate } from 'react-router-dom'
 import UploadPanel from '../components/UploadPanel'
 import InputForm from '../components/InputForm'
 
+const API_BASE = import.meta.env.VITE_API_URL || ''
+
 // The initial empty state for the campaign context form
 const EMPTY_FORM = {
   brand_name: '',
@@ -34,7 +36,7 @@ export default function Dashboard() {
     setNikeLoading(true)
     setSubmitError('')
     try {
-      const response = await fetch('/api/test-nike', { method: 'POST' })
+      const response = await fetch(`${API_BASE}/api/test-nike`, { method: 'POST' })
       if (!response.ok) {
         const err = await response.json().catch(() => ({}))
         throw new Error(err.detail || `Server error: ${response.status}`)
@@ -79,7 +81,7 @@ export default function Dashboard() {
       data.append('output_mode', outputMode)
 
       // POST to the backend API
-      const response = await fetch('/api/analyse', {
+      const response = await fetch(`${API_BASE}/api/analyse`, {
         method: 'POST',
         body: data  // FormData handles the Content-Type header automatically
       })

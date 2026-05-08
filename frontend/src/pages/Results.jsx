@@ -12,6 +12,8 @@ import QuickSummary from '../components/QuickSummary'
 import FullAnalysis from '../components/FullAnalysis'
 import PDFDownload from '../components/PDFDownload'
 
+const API_BASE = import.meta.env.VITE_API_URL || ''
+
 export default function Results() {
   const { sessionId } = useParams()    // the session ID from the URL
   const navigate = useNavigate()
@@ -35,7 +37,7 @@ export default function Results() {
     if (!sessionId) return
 
     // Open an SSE connection to the backend progress endpoint
-    const eventSource = new EventSource(`/api/progress/${sessionId}`)
+    const eventSource = new EventSource(`${API_BASE}/api/progress/${sessionId}`)
     eventSourceRef.current = eventSource
 
     // Called each time the backend sends a progress event

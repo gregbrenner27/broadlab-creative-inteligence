@@ -4,6 +4,8 @@
 
 import React, { useState } from 'react'
 
+const API_BASE = import.meta.env.VITE_API_URL || ''
+
 export default function PDFDownload({ sessionId, brandName }) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -14,7 +16,7 @@ export default function PDFDownload({ sessionId, brandName }) {
 
     try {
       // Fetch the PDF from the backend
-      const response = await fetch(`/api/pdf/${sessionId}`)
+      const response = await fetch(`${API_BASE}/api/pdf/${sessionId}`)
 
       if (!response.ok) {
         throw new Error(`PDF generation failed: ${response.statusText}`)

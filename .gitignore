@@ -1,0 +1,41 @@
+# Environment variables — never commit these, they contain your secret API keys
+.env
+
+# Python cache files — created automatically, safe to ignore
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+
+# Virtual environment — the isolated Python environment for this project
+venv/
+env/
+.venv/
+
+# Node.js dependencies — installed via npm, not committed to git
+node_modules/
+
+# Build output — generated files, not source
+frontend/dist/
+frontend/build/
+
+# Temporary files created during analysis pipeline runs
+backend/temp/
+*.wav
+*.json.tmp
+
+# Video files — too large for GitHub (use test-assets/nike_rekognition.json instead)
+*.mp4
+*.mov
+*.avi
+
+# macOS system files
+.DS_Store
+
+# IDE settings
+.vscode/
+.idea/

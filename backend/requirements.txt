@@ -1,0 +1,52 @@
+# ============================================================
+# BROADLAB CREATIVE INTELLIGENCE — Python Dependencies
+# ============================================================
+# Install all of these by running:
+#   pip install -r requirements.txt
+# (Make sure you have activated your virtual environment first)
+# ============================================================
+
+# FastAPI — the web framework that powers the backend API server
+fastapi==0.115.5
+
+# Uvicorn — the server that runs FastAPI (like an engine for the API)
+uvicorn[standard]==0.32.1
+
+# Python-multipart — allows FastAPI to receive file uploads (the MP4)
+python-multipart==0.0.12
+
+# Anthropic — official Python library for the Claude AI API
+anthropic==0.40.0
+
+# OpenAI — official Python library for Whisper speech transcription
+openai==1.57.0
+
+# Boto3 — official AWS Python library (used for Rekognition and S3)
+boto3==1.35.81
+
+# Librosa — audio analysis library (tempo, energy, spectral features)
+librosa==0.10.2.post1
+
+# NumPy — numerical computing library, required by Librosa
+numpy==1.26.4
+
+# SoundFile — reads audio files, required by Librosa
+soundfile==0.12.1
+
+# ReportLab — generates PDF files from the final report
+reportlab==4.2.5
+
+# Pillow — image processing library, required by ReportLab for image handling
+Pillow==11.0.0
+
+# Python-dotenv — reads your .env file so API keys are available to the code
+python-dotenv==1.0.1
+
+# HTTPX — HTTP client library, used internally by some dependencies
+httpx==0.27.2
+
+# Pydantic — data validation library, used by FastAPI to define request/response shapes
+pydantic==2.10.3
+
+# AIOFiles — allows FastAPI to read/write files without blocking
+aiofiles==24.1.0

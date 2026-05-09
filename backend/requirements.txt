@@ -50,3 +50,6 @@ pydantic==2.10.3
 
 # AIOFiles — allows FastAPI to read/write files without blocking
 aiofiles==24.1.0
+
+# Static-FFmpeg — installs FFmpeg binary via pip, no system installation needed
+static-ffmpeg==2.5

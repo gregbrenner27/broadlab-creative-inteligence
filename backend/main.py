@@ -49,6 +49,10 @@ from generate_pdf import create_pdf_report
 # Load API keys from the .env file in the project root
 load_dotenv(dotenv_path=Path(__file__).parent.parent / ".env")
 
+# Add static ffmpeg binary to PATH — works without system-level ffmpeg install
+import static_ffmpeg
+static_ffmpeg.add_paths()
+
 # Configure logging so we can see what's happening in the terminal
 logging.basicConfig(
     level=logging.INFO,

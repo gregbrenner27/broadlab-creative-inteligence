@@ -1,7 +1,7 @@
 // FullAnalysis.jsx — Tabbed layout for the Full Analysis output mode.
 // Four tabs: Overview, Creative Genome, Resonance Scores, Targeting.
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 
 const TABS = [
   { key: 'overview',  label: 'Overview' },
@@ -72,6 +72,7 @@ function OverviewTab({ data }) {
               </span>
               <span className="text-broadlab-grey text-lg">/10</span>
             </div>
+            <TierBadge score={data.overall_score} />
           </div>
         </div>
       </Card>
@@ -166,6 +167,12 @@ function ResonanceTab({ data }) {
 }
 
 function PersonaScorecard({ persona }) {
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => {
+    const t = setTimeout(() => setMounted(true), 50)
+    return () => clearTimeout(t)
+  }, [])
+
   const dimensions = [
     { key: 'emotional_power',        label: 'Emotional Power',         weight: '30%' },
     { key: 'emotional_register_match', label: 'Emotional Register Match', weight: '25%' },
@@ -201,6 +208,7 @@ function PersonaScorecard({ persona }) {
                 ? persona.overall_score.toFixed(1)
                 : persona.overall_score}
             </p>
+            <TierBadge score={persona.overall_score} />
           </div>
         </div>
       </div>
@@ -223,11 +231,14 @@ function PersonaScorecard({ persona }) {
                   {score != null ? score : '–'}/10
                 </span>
               </div>
-              {/* Score bar */}
+              {/* Score bar — animates from 0 on mount, staggered by index */}
               <div className="w-full bg-broadlab-muted rounded-full h-1.5 mb-2">
                 <div
-                  className="h-1.5 rounded-full bg-broadlab-red transition-all duration-500"
-                  style={{ width: `${pct}%` }}
+                  className="h-1.5 rounded-full bg-broadlab-red"
+                  style={{
+                    width: mounted ? `${pct}%` : '0%',
+                    transition: `width 700ms cubic-bezier(0.4, 0, 0.2, 1) ${i * 80}ms`,
+                  }}
                 />
               </div>
               {reason && (
@@ -331,6 +342,18 @@ function TargetingTab({ data }) {
 }
 
 // ---- SHARED UI ATOMS ----
+
+function TierBadge({ score }) {
+  const tier = score >= 8   ? { label: 'HIGH',         cls: 'text-green-400 bg-green-400/10 border-green-400/20' }
+             : score >= 6   ? { label: 'MEDIUM',        cls: 'text-yellow-400 bg-yellow-400/10 border-yellow-400/20' }
+             : score >= 4   ? { label: 'LOW',           cls: 'text-orange-400 bg-orange-400/10 border-orange-400/20' }
+             :                { label: 'DEPRIORITISE',  cls: 'text-red-400 bg-red-400/10 border-red-400/20' }
+  return (
+    <span className={`inline-block mt-1.5 text-xs font-semibold tracking-wider px-2 py-0.5 rounded border ${tier.cls}`}>
+      {tier.label}
+    </span>
+  )
+}
 
 function Card({ children, title }) {
   return (

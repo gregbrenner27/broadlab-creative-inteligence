@@ -4,6 +4,18 @@
 
 import React from 'react'
 
+function TierBadge({ score }) {
+  const tier = score >= 8   ? { label: 'HIGH',         cls: 'text-green-400 bg-green-400/10 border-green-400/20' }
+             : score >= 6   ? { label: 'MEDIUM',        cls: 'text-yellow-400 bg-yellow-400/10 border-yellow-400/20' }
+             : score >= 4   ? { label: 'LOW',           cls: 'text-orange-400 bg-orange-400/10 border-orange-400/20' }
+             :                { label: 'DEPRIORITISE',  cls: 'text-red-400 bg-red-400/10 border-red-400/20' }
+  return (
+    <span className={`inline-block mt-1.5 text-xs font-semibold tracking-wider px-2 py-0.5 rounded border ${tier.cls}`}>
+      {tier.label}
+    </span>
+  )
+}
+
 export default function QuickSummary({ data }) {
   // data = report.report.quick_summary
   if (!data) return null
@@ -17,7 +29,6 @@ export default function QuickSummary({ data }) {
     targeting_recommendation
   } = data
 
-  // Determine colour for score
   const scoreColor = overall_score >= 8 ? 'text-green-400' :
                      overall_score >= 6 ? 'text-broadlab-red' :
                      overall_score >= 4 ? 'text-yellow-500' : 'text-red-500'
@@ -47,6 +58,7 @@ export default function QuickSummary({ data }) {
               </span>
               <span className="text-broadlab-grey text-lg">/10</span>
             </div>
+            <TierBadge score={overall_score} />
           </div>
         </div>
 

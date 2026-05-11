@@ -6,37 +6,93 @@ If something is unclear, ask. The person you are working with (Greg) has no codi
 
 If a task would require changing something that already works, flag it before touching it.
 
+Make all architectural decisions unless Greg specifically asks to choose. Always explain what you are doing and why in plain English before doing it.
+
 ---
 
-## What this is
+## Who Greg is
 
-An internal web tool for Broadlab — a UK-based AI-driven addressable TV advertising company. Campaign team members upload a video ad (MP4), fill in basic campaign context, and the system automatically analyses the ad and produces a **resonance scorecard** — a structured report that predicts which UK audience demographics will respond best to the ad and why.
+Greg is non-technical — zero experience with Python, React, JavaScript, or any programming. He has just started working at Broadlab and built this prototype before joining. He needs exact terminal commands, plain English explanations, and step-by-step guidance for everything. Never use jargon without explaining it first.
 
-The output directly informs postcode-level targeting for CTV (connected TV) campaigns across 18 million UK households.
+---
 
-**The core question the system answers:** Which type of person is this ad psychologically built for, and where in the UK do we find the most of those people?
+## What Broadlab is
+
+Broadlab is a UK-based AI-driven Connected TV (CTV) advertising company. They help brands show video ads to specific households across 18 million UK homes, targeted at postcode level. Their core job is answering: who should see this ad, and where in the UK do those people live?
+
+Broadlab has a campaign planning tool live at `https://campaigns.broadlab.tech/home`. A user enters a company name, industry, budget, KPIs, and an audience brief. Using Broadlab's proprietary postcode and household data, the tool outputs recommended audience personas, media suppliers, and impression volumes for the campaign. The GitHub repo for this tool is `https://github.com/broadlab-tv/audience_builder.git` (private — accessible from Broadlab's systems).
+
+---
+
+## What the Creative Intelligence Platform is
+
+An internal web tool where a team member uploads a video ad (MP4), fills in a short campaign brief, and receives a structured report showing which UK audience types the ad will resonate with most — scored across five psychological dimensions with plain English reasoning behind every score.
+
+**The core question it answers:** Is this creative actually right for the audience we are targeting — and if not, who is it right for?
+
+The output is available on screen or as a downloadable PDF.
+
+---
+
+## Where Creative Intelligence fits into Broadlab's workflow
+
+Broadlab's campaign tool (audience_builder) outputs who to target and where. The Creative Intelligence Platform answers whether the ad itself will resonate with those people.
+
+These are two halves of the same workflow:
+
+1. Brand brings a campaign brief → audience_builder outputs personas and postcodes
+2. Brand brings the video ad → Creative Intelligence scores it against those personas
+3. If scores are strong, the campaign proceeds with confidence
+4. If scores are weak, the creative is adjusted before money is spent
+
+The long-term vision is for these two tools to work together — the persona output from the campaign tool feeds directly into the creative scoring. This is the integration to build toward.
 
 ---
 
 ## Current build status
 
-The full system is built and running locally. It has been tested against the Nike "Why Do It 2025" ad and produces a complete output. The next step is deploying it so any Broadlab employee can access it via a URL (Railway for backend, Vercel for frontend).
+The full system is built and tested locally. It has been tested end to end against the Nike "Why Do It 2025" ad and produces a complete scored report. The tool is not yet permanently hosted online — the backend requires manual startup in Terminal.
 
 **What works:**
 - Full 8-step analysis pipeline runs end to end
 - Dashboard UI at http://localhost:5173
-- Nike test case button on the dashboard
+- Nike test case button (one click, no upload needed)
 - Quick Summary and Full Analysis output modes
 - PDF download
 - Anthropic API key configured
 - OpenAI API key configured
 
-**What is not set up yet:**
-- AWS Rekognition (not needed — replaced with Claude Vision)
-- Railway deployment (in progress)
-- Vercel deployment (in progress)
-- Snowflake postcode data (future integration)
-- DAIVID emotion scores (future integration)
+**What is not yet set up:**
+- Permanent backend hosting (Render free tier ran out of memory — needs Standard plan at $25/month or alternative)
+- Vercel frontend deployment (configured but backend not live yet)
+- Snowflake postcode data connection (future integration)
+- DAIVID emotion score API (future integration)
+- Integration with audience_builder persona output
+
+---
+
+## Feature roadmap — build in this order
+
+| Priority | Feature | What it does | Effort |
+|---|---|---|---|
+| 1 | Plain English reasoning on every score | Every score includes 2–3 sentences explaining exactly why that number was given | Low — prompt update only |
+| 2 | "Who is this report for?" setting | User selects: Internal Team, Client Presentation, Media Planning, or Executive Summary. Claude adjusts language and detail accordingly | Low — one form field, one prompt update |
+| 3 | Frames every 2 seconds instead of 6 | Triples visual coverage of the ad. Quick improvement to visual analysis accuracy | Very low — one number changes |
+| 4 | Full video input to Claude | Send the entire MP4 to Claude instead of extracted frames. Claude watches the full ad. Removes the frame limitation entirely | Medium — replaces pipeline steps 4 and 5 |
+| 5 | Confidence indicator on each score | Flags High / Medium / Needs Human Review on each score based on data quality available | Medium |
+| 6 | Post-report chatbot | After the report, user can ask follow-up questions. Claude only answers what it can ground in the report — refuses to speculate | Medium-high |
+| 7 | Side-by-side ad comparison | Analyse multiple creatives simultaneously and compare scores | High |
+| 8 | UK postcode targeting layer | Connect to Broadlab's Snowflake data to output specific postcode recommendations matching top-scoring audiences | High — requires Snowflake access from Broadlab |
+| 9 | Integration with audience_builder | Persona output from Broadlab's campaign tool feeds directly into Creative Intelligence scoring | High — requires access to audience_builder repo and data |
+
+---
+
+## Known limitations and planned fixes
+
+**Visual analysis gap:** Claude currently only sees a still frame every 6 seconds. For a 30-second ad that is 5 images. Fast cuts, short product reveals, and key visual moments can be missed entirely.
+
+- Quick fix: increase to 1 frame every 2 seconds (Feature 3 above)
+- Proper fix: send the full MP4 directly to Claude so it watches the entire video (Feature 4 above)
 
 ---
 
@@ -80,8 +136,10 @@ Tailwind custom colours are configured in `frontend/tailwind.config.js` under th
 broadlab-creative-intelligence/
 ├── CLAUDE.md                        ← this file
 ├── README.md                        ← setup instructions for humans
+├── Broadlab Creative Intelligence — Overview.md  ← one-page summary for sharing with the team
 ├── .env                             ← API keys (never commit this)
 ├── .gitignore
+├── render.yaml                      ← Render deployment config (backend hosting)
 │
 ├── framework/                       ← research methodology (read-only reference)
 │   ├── RESEARCH_FRAMEWORK.md        ← the 5 scoring dimensions, DAIVID cohorts, demographic patterns
@@ -115,7 +173,7 @@ broadlab-creative-intelligence/
 │   │   ├── analyse_audio.py         ← Step 2: Librosa analyses tempo/energy/spectral
 │   │   ├── transcribe.py            ← Step 3: OpenAI Whisper transcribes speech
 │   │   ├── extract_frames.py        ← Step 4: FFmpeg extracts JPEG frames every 6s
-│   │   ├── analyse_frames.py        ← Step 5: Claude Vision analyses frames (replaced AWS)
+│   │   ├── analyse_frames.py        ← Step 5: Claude Vision analyses frames
 │   │   └── run_rekognition.py       ← legacy AWS step + file loader for Nike test JSON
 │   │
 │   └── claude/                      ← three Claude API synthesis calls
@@ -132,6 +190,7 @@ broadlab-creative-intelligence/
         ├── main.jsx                 ← React entry point
         ├── App.jsx                  ← routing (/ = Dashboard, /results/:id = Results)
         ├── index.css                ← Tailwind + global styles
+        ├── assets/                  ← logo and static images
         ├── components/
         │   ├── UploadPanel.jsx      ← drag-and-drop MP4 upload
         │   ├── InputForm.jsx        ← campaign context + audience + output mode
@@ -161,9 +220,7 @@ Every time an analysis runs, these steps execute in sequence. Progress is stream
 | 7 | `resonance_call.py` | Claude scores the ad against the target persona (5 dimensions) |
 | 8 | `synthesis_call.py` | Claude produces Quick Summary + Full Analysis + PDF content |
 
-Step 5 uses Claude Vision (not AWS). No AWS account is needed. The only API keys required are Anthropic and OpenAI.
-
-For the Nike test case, Step 5 uses a pre-loaded Rekognition JSON from `test-assets/nike_rekognition.json` instead of Claude Vision, because that file contains richer celebrity detection data.
+For the Nike test case, Step 5 uses a pre-loaded Rekognition JSON from `test-assets/nike_rekognition.json` instead of Claude Vision.
 
 ---
 
@@ -183,6 +240,8 @@ Overall = (D1 × 0.30) + (D2 × 0.25) + (D3 × 0.20) + (D4 × 0.15) + (D5 × 0.1
 
 Budget concentration tiers: 8.0–10.0 = High, 6.0–7.9 = Medium, 4.0–5.9 = Low, 0–3.9 = Deprioritise
 
+Grounded in DAIVID's 39-emotion framework and System1 advertising effectiveness research.
+
 Full methodology is in `framework/RESEARCH_FRAMEWORK.md` and `framework/SCORING_RUBRIC.md`.
 
 ---
@@ -196,62 +255,63 @@ ANTHROPIC_API_KEY=        ← configured ✓
 OPENAI_API_KEY=           ← configured ✓
 AWS_ACCESS_KEY_ID=        ← not needed (Claude Vision replaced Rekognition)
 AWS_SECRET_ACCESS_KEY=    ← not needed
-AWS_REGION=eu-west-2
-AWS_S3_BUCKET=            ← not needed
-AWS_REKOGNITION_ROLE_ARN= ← not needed
 BACKEND_PORT=8000
 FRONTEND_PORT=5173
 ```
 
-For production deployment (Railway), these are set as environment variables in the Railway dashboard — no `.env` file on the server.
+For production deployment, these are set as environment variables in the hosting dashboard — no `.env` file on the server.
 
 ---
 
 ## How to run locally
 
-Requires: Node.js, Python 3.9+, FFmpeg (`brew install ffmpeg`)
+Requires: Node.js, Python 3.9+, FFmpeg
 
-**Terminal 1 — backend:**
+**Terminal 1 — backend (start this first, wait for it to finish loading):**
 ```bash
-cd "/Users/gregbrenner/creative inteligence (broadlab)/broadlab-creative-intelligence/backend"
-source venv/bin/activate
-python main.py
+cd "/Users/gregbrenner/creative inteligence (broadlab)/broadlab-creative-intelligence/backend" && source venv/bin/activate && python main.py
 ```
+Wait until you see: `Uvicorn running on http://0.0.0.0:8000`
 
 **Terminal 2 — frontend:**
 ```bash
-cd "/Users/gregbrenner/creative inteligence (broadlab)/broadlab-creative-intelligence/frontend"
-npm run dev
+cd "/Users/gregbrenner/creative inteligence (broadlab)/broadlab-creative-intelligence/frontend" && npm run dev
 ```
+Wait until you see: `Local: http://localhost:5173`
 
 Then open: http://localhost:5173
 
+Keep both Terminal windows open. Closing either one stops that half of the tool.
+
+Note: the file paths above are for Greg's personal Mac. On a new computer the paths will be different — update them to wherever the repo was cloned.
+
 ---
 
-## Deployment target
+## Deployment
 
-- **Backend:** Railway (railway.app) — Python FastAPI server
-- **Frontend:** Vercel (vercel.com) — React/Vite app
+- **Frontend:** Vercel (vercel.com) — configured, deploys automatically on git push
+- **Backend:** Render (render.com) — render.yaml is configured. Free tier ran out of memory (512MB limit exceeded by heavy Python libraries). Needs Standard plan ($25/month, 2GB RAM) to run reliably.
 - **Repo:** https://github.com/gregbrenner27/broadlab-creative-inteligence
 
-Deployment is in progress. When complete, any Broadlab employee will access the tool via a single URL with no local setup required.
-
 ---
 
-## Future integrations (not built yet)
+## What Broadlab needs to provide for full capability
 
-| Integration | File | What it adds |
-|---|---|---|
-| DAIVID API | `future/DAIVID_INTEGRATION.md` | Replaces inferred emotion scores with validated human-response data |
-| Broadlab Motivation Graph | `future/MOTIVATION_GRAPH.md` | Replaces generic 5-state motivation framework with Broadlab's proprietary taxonomy |
-| Snowflake postcode data | `future/SNOWFLAKE_INTEGRATION.md` | Adds specific UK postcode recommendations to the targeting section |
+| What | Why |
+|---|---|
+| Access to Snowflake postcode data | To output specific UK postcode recommendations |
+| Audience segmentation taxonomy | To replace generic audience types with Broadlab's own |
+| Motivation framework | Proprietary version built from Broadlab's campaign data |
+| DAIVID API access | To replace inferred emotion scores with validated human-response data |
+| Access to audience_builder repo | To understand persona structure and build the integration |
+| A real client brief to test against | To validate and calibrate scoring against an actual campaign |
 
 ---
 
 ## Key decisions already made — do not reverse without asking
 
-- **Claude Vision replaced AWS Rekognition** — this was intentional. AWS required too much setup for a self-service internal tool. Claude Vision works with just the Anthropic key.
-- **claude-sonnet-4-5 is the model** — specified in the original brief. Do not change without asking.
+- **Claude Vision replaced AWS Rekognition** — intentional. AWS required too much setup. Claude Vision works with just the Anthropic key.
+- **claude-sonnet-4-5 is the model** — do not change without asking.
 - **max_tokens is 8192 for genome and resonance calls** — was 4096, caused truncated JSON. Do not lower this.
-- **Sessions stored in memory** — fine for now, will move to file-based storage before production deployment.
-- **No AWS dependency** — the system is designed to work with Anthropic + OpenAI only.
+- **Sessions stored in memory** — fine for now, will move to file-based storage before production.
+- **No AWS dependency** — system is designed to work with Anthropic + OpenAI only.

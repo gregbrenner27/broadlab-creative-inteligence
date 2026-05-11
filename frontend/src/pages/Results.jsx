@@ -7,6 +7,7 @@
 
 import React, { useState, useEffect, useRef } from 'react'
 import { useParams, useNavigate, useLocation } from 'react-router-dom'
+import logo from '../assets/broadlab-logo.png'
 import AnalysisProgress from '../components/AnalysisProgress'
 import QuickSummary from '../components/QuickSummary'
 import FullAnalysis from '../components/FullAnalysis'
@@ -100,10 +101,9 @@ export default function Results() {
     <div className="min-h-screen bg-broadlab-dark">
       {/* ---- TOP NAV BAR ---- */}
       <header className="border-b border-broadlab-border px-8 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <span className="text-white font-bold text-lg tracking-tight">BROADLAB</span>
-          <span className="w-px h-4 bg-broadlab-border" />
-          <span className="text-broadlab-grey text-sm">Creative Intelligence</span>
+        <div className="flex items-center gap-2.5">
+          <img src={logo} alt="Broadlab" className="h-8 w-auto" />
+          <span className="text-white font-bold text-lg tracking-widest">BROADLAB</span>
         </div>
         {isComplete && (
           <button

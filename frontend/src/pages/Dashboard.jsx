@@ -6,6 +6,7 @@ import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import UploadPanel from '../components/UploadPanel'
 import InputForm from '../components/InputForm'
+import logo from '../assets/broadlab-logo.png'
 
 const API_BASE = import.meta.env.VITE_API_URL || ''
 
@@ -108,11 +109,9 @@ export default function Dashboard() {
     <div className="min-h-screen bg-broadlab-dark">
       {/* ---- TOP NAV BAR ---- */}
       <header className="border-b border-broadlab-border px-8 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          {/* Broadlab wordmark */}
-          <span className="text-white font-bold text-lg tracking-tight">BROADLAB</span>
-          <span className="w-px h-4 bg-broadlab-border" />
-          <span className="text-broadlab-grey text-sm">Creative Intelligence</span>
+        <div className="flex items-center gap-2.5">
+          <img src={logo} alt="Broadlab" className="h-8 w-auto" />
+          <span className="text-white font-bold text-lg tracking-widest">BROADLAB</span>
         </div>
         {/* Version badge */}
         <span className="text-xs text-broadlab-grey/50 font-mono">v1.0</span>
@@ -138,7 +137,7 @@ export default function Dashboard() {
           <div>
             <p className="text-white text-sm font-semibold">Nike — Why Do It 2025</p>
             <p className="text-broadlab-grey text-xs mt-0.5">
-              Pre-loaded test case · Uses existing Rekognition data · No AWS needed
+              Pre-loaded test case · No API keys consumed · Skip straight to results
             </p>
           </div>
           <button
